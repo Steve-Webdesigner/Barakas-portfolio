@@ -73,11 +73,16 @@ body{
     background:#081120;
     padding:30px;
     border-radius:20px;
-    transition:.4s;
+    transition:transform .35s ease, opacity .35s ease, right .35s ease;
+    opacity:0;
   }
-  .nav-links.show-menu{right:20px;}
+  .nav-links.show-menu{
+    right:20px;
+    opacity:1;
+  }
   .menu-btn{display:block;}
 }
+
 
 /* ==========================
    Reusable UI tokens
@@ -147,8 +152,9 @@ body{
   position:relative;
   display:flex;
   justify-content:center;
-  min-width:420px;
+  min-width:0;
 }
+
 
 .hero-badge{
   display:inline-block;
