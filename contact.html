@@ -60,14 +60,14 @@
         <div class="contact-cards">
           <div class="info-box">
             <h3>Email</h3>
-            <p>yourgmail@gmail.com</p>
-            <a class="info-link" href="mailto:yourgmail@gmail.com">Send Email</a>
+            <p>otienostephenbaraka@gmail.com</p>
+            <a class="info-link" href="mailto:otienostephenbaraka@gmail.com">Send Email</a>
           </div>
 
           <div class="info-box">
             <h3>Phone</h3>
-            <p>+254 700 000 000</p>
-            <a class="info-link" href="tel:+254700000000">Call / WhatsApp</a>
+            <p>+254 746137413</p>
+            <a class="info-link" href="tel:+254746137413">Call / WhatsApp</a>
           </div>
 
           <div class="info-box">
@@ -90,7 +90,7 @@
       <div class="contact-form reveal">
         <h2>Send Me A Message</h2>
 
-        <form>
+        <form id="contact-form">
           <div class="input-row">
             <input type="text" name="name" placeholder="Your Name" required>
             <input type="email" name="email" placeholder="Your Email" required>
@@ -99,10 +99,12 @@
           <input type="text" name="subject" placeholder="Subject" required>
           <textarea name="message" rows="7" placeholder="Your Message" required></textarea>
 
-          <button type="submit" class="primary-btn">
+          <button type="submit" class="primary-btn" target="_blank">
             Send Message
             <i class="fa-regular fa-paper-plane"></i>
           </button>
+          <p id="status-message"></p>
+
         </form>
       </div>
     </div>
@@ -113,6 +115,8 @@
     <h2>stephenPortfolio</h2>
     <p>Building beautiful web experiences.</p>
   </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
   <script src="portfolioscript.js"></script>
 </body>
