@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Understanding the JavaScript Event Loop | Stephen Baraka</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../portfoliostyle.fixed.css">
+  <link rel="stylesheet" href="../article.css">
+</head>
+<body>
+  <div class="reading-progress"></div>
+  <header class="navbar">
+    <div class="logo">
+      <span class="logo-mark">SB</span>
+      <span class="logo-text">Stephen Baraka</span>
+    </div>
+    <nav class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="../about.html">About</a>
+      <a href="../skills.html">Skills</a>
+      <a href="../projects.html">Projects</a>
+      <a class="active" href="../blog.html">Blog</a>
+      <a href="../contact.html">Contact</a>
+    </nav>
+    <div class="menu-btn" aria-label="Open navigation menu" role="button" tabindex="0">
+      <i class="fa-solid fa-bars" aria-hidden="true"></i>
+    </div>
+  </header>
+  <article>
+    <section class="article-hero reveal-article">
+      <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&q=80" alt="JavaScript code" class="article-hero-image" loading="lazy">
+      <div class="article-hero-meta">
+        <span class="article-category-badge">JavaScript</span>
+        <span class="article-date"><i class="fa-regular fa-calendar"></i> Nov 22, 2025</span>
+        <span class="article-read-time"><i class="fa-regular fa-clock"></i> 7 min read</span>
+      </div>
+      <h1>Understanding the JavaScript Event Loop</h1>
+      <p class="article-author-line">By <strong>Stephen Baraka</strong></p>
+    </section>
+    <div class="article-wrapper">
+      <aside class="article-toc reveal-article">
+        <h3>Contents</h3>
+        <ul>
+          <li><a href="#introduction">Introduction</a></li>
+          <li><a href="#single-threaded">Single-Threaded Nature</a></li>
+          <li><a href="#call-stack">The Call Stack</a></li>
+          <li><a href="#task-queue">Task Queue &amp; Microtask Queue</a></li>
+          <li><a href="#event-loop">The Event Loop</a></li>
+          <li><a href="#async">Async/Await &amp; Promises</a></li>
+          <li><a href="#examples">Practical Examples</a></li>
+          <li><a href="#conclusion">Conclusion</a></li>
+        </ul>
+      </aside>
+      <div class="article-content reveal-article">
+        <a href="../blog.html" class="back-to-blog"><i class="fa-solid fa-arrow-left"></i> Back to Blog</a>
+
+        <h2 id="introduction">Introduction</h2>
+        <p>The JavaScript event loop is one of the most important concepts to understand if you want to write efficient, non-blocking code. It's the mechanism that allows JavaScript to perform asynchronous operations despite being single-threaded. In this guide, I'll break down the event loop visually and explain how the call stack, task queue, and microtask queue work together.</p>
+
+        <h2 id="single-threaded">Single-Threaded Nature</h2>
+        <p>JavaScript is single-threaded, meaning it can only execute one instruction at a time. This might sound like a limitation, but the event loop makes it possible to handle multiple operations concurrently without blocking the main thread. Understanding this fundamental concept is key to mastering asynchronous programming.</p>
+        <p>When you make a network request, read a file, or set a timer, JavaScript doesn't wait for the operation to complete. Instead, it delegates the work to the browser or Node.js runtime and continues executing other code. When the operation finishes, a callback is placed in the task queue, waiting to be executed.</p>
+
+        <h2 id="call-stack">The Call Stack</h2>
+        <p>The call stack is a data structure that keeps track of function calls. When you call a function, it's pushed onto the stack. When the function returns, it's popped off the stack. This is how JavaScript knows which function is currently executing and which functions are waiting to be executed.</p>
+        <p>If the call stack gets too deep (for example, from infinite recursion), you'll get a "Maximum call stack size exceeded" error. This is also why blocking the call stack with long-running synchronous operations freezes the browser — no other code can run until the stack is cleared.</p>
+
+        <div class="highlight-box">
+          <p><strong>💡 Key Insight:</strong> The call stack is LIFO (Last In, First Out). The last function pushed onto the stack is the first one to be popped off when it completes.</p>
+        </div>
+
+        <h2 id="task-queue">Task Queue &amp; Microtask Queue</h2>
+        <p>There are actually two queues that feed into the event loop:</p>
+        <ul>
+          <li><strong>Task Queue (Macrotask Queue):</strong> Contains callbacks from setTimeout, setInterval, I/O operations, and DOM events.</li>
+          <li><strong>Microtask Queue:</strong> Contains callbacks from Promises (then, catch, finally), MutationObserver, and queueMicrotask.</li>
+        </ul>
+        <p>Microtasks have higher priority than macrotasks. After each macrotask, the event loop checks the microtask queue and processes all pending microtasks before moving to the next macrotask. This ensures that promise resolutions are handled as soon as possible.</p>
+
+        <h2 id="event-loop">The Event Loop</h2>
+        <p>The event loop is the orchestrator that coordinates the call stack, task queue, and microtask queue. Its job is simple: if the call stack is empty, take the first callback from the microtask queue (or task queue if microtasks are empty) and push it onto the call stack for execution.</p>
+        <p>The event loop cycle works like this:</p>
+        <ol>
+          <li>Execute any synchronous code on the call stack</li>
+          <li>When the call stack is empty, process all microtasks in the microtask queue</li>
+          <li>After all microtasks are processed, pick one macrotask from the task queue</li>
+          <li>Execute that macrotask (which may add more microtasks)</li>
+          <li>Repeat the cycle</li>
+        </ol>
+
+        <h2 id="async">Async/Await &amp; Promises</h2>
+        <p>Async/await is syntactic sugar over Promises, but it's important to understand how they interact with the event loop. When you <code>await</code> a promise, the function is paused and the call stack is freed to execute other code. When the promise resolves, the continuation of the async function is scheduled as a microtask.</p>
+        <p>This means that code after an <code>await</code> expression runs asynchronously, after the current synchronous code and any previously scheduled microtasks have completed. Understanding this ordering is crucial for debugging asynchronous code.</p>
+
+        <pre><code>console.log('1');
+setTimeout(() => console.log('2'), 0);
+Promise.resolve().then(() => console.log('3'));
+console.log('4');
+// Output: 1, 4, 3, 2</code></pre>
+
+        <p>In the example above, <code>console.log('1')</code> and <code>console.log('4')</code> run synchronously. The promise callback (microtask) runs before the setTimeout callback (macrotask), even though both are technically queued at the same time.</p>
+
+        <h2 id="examples">Practical Examples</h2>
+        <h3>Example 1: Blocking the Event Loop</h3>
+        <p>Avoid long-running synchronous operations on the main thread. If you need to process a large amount of data, consider using Web Workers or breaking the work into smaller chunks with setTimeout.</p>
+
+        <h3>Example 2: Using Microtasks Effectively</h3>
+        <p>If you need to execute code as soon as possible after a promise resolves, the microtask queue is your friend. Use <code>queueMicrotask()</code> or <code>Promise.resolve().then()</code> to schedule high-priority callbacks.</p>
+
+        <h3>Example 3: Debouncing with setTimeout</h3>
+        <p>Debouncing user input (like search queries) uses the task queue to delay execution until the user stops typing. This is a practical application of understanding macrotask scheduling.</p>
+
+        <div class="highlight-box">
+          <p><strong>💡 Pro Tip:</strong> Use the browser's Performance tab in DevTools to visualize the event loop in action. Record a session and look at the "Main" section to see how tasks, microtasks, and rendering are interleaved.</p>
+        </div>
+
+        <h2 id="conclusion">Conclusion</h2>
+        <p>The JavaScript event loop is the backbone of asynchronous programming in JavaScript. By understanding the call stack, task queue, and microtask queue, you can write code that is efficient, predictable, and free of race conditions. Remember: microtasks run before macrotasks, and the event loop never sleeps — it's always checking if there's work to do.</p>
+        <p>Mastering the event loop transforms you from a developer who writes code that "just works" to one who understands exactly why and how it works. This knowledge will help you debug complex issues, optimize performance, and build more reliable applications.</p>
+
+        <div class="author-card">
+          <div class="author-avatar">SB</div>
+          <div class="author-info">
+            <h4>Stephen Baraka</h4>
+            <p>Full Stack Web Developer passionate about building modern, responsive, and user-friendly digital experiences. Sharing my journey and knowledge with the developer community.</p>
+          </div>
+        </div>
+
+        <div class="article-actions">
+          <span class="share-label">Share:</span>
+          <a href="https://linkedin.com/share?url=YOUR_URL" target="_blank" class="share-btn" aria-label="Share on LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+          <a href="https://twitter.com/intent/tweet?url=YOUR_URL" target="_blank" class="share-btn" aria-label="Share on X"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="https://facebook.com/sharer/sharer.php?u=YOUR_URL" target="_blank" class="share-btn" aria-label="Share on Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <button class="copy-link-btn"><i class="fa-regular fa-link"></i> Copy Link</button>
+        </div>
+
+        <div class="article-nav">
+          <a href="github-tips.html" class="nav-prev">
+            <span class="nav-label"><i class="fa-solid fa-arrow-left"></i> Previous</span>
+            <span class="nav-title">GitHub Tips for Beginners</span>
+          </a>
+          <a href="web-development-journey.html" class="nav-next">
+            <span class="nav-label">Next <i class="fa-solid fa-arrow-right"></i></span>
+            <span class="nav-title">My Journey Into Web Development</span>
+          </a>
+        </div>
+
+        <div class="related-section">
+          <h3>Related Articles</h3>
+          <div class="related-grid">
+            <a href="javascript-concepts.html" class="related-card">
+              <img src="https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=400&q=80" alt="JavaScript Concepts" loading="lazy">
+              <div class="related-card-body">
+                <h4>JavaScript Concepts Every Developer Should Know</h4>
+                <span>Dec 20, 2025 · 7 min read</span>
+              </div>
+            </a>
+            <a href="react-tips.html" class="related-card">
+              <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&q=80" alt="React Tips" loading="lazy">
+              <div class="related-card-body">
+                <h4>5 React Tips That Improved My Workflow</h4>
+                <span>Dec 28, 2025 · 6 min read</span>
+              </div>
+            </a>
+            <a href="web-development-journey.html" class="related-card">
+              <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&q=80" alt="Web Development" loading="lazy">
+              <div class="related-card-body">
+                <h4>My Journey Into Web Development</h4>
+                <span>Jan 15, 2026 · 5 min read</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </article>
+  <button class="scroll-top-btn" aria-label="Scroll to top"><i class="fa-solid fa-arrow-up"></i></button>
+  <script src="../portfolioscript.js"></script>
+  <script src="../article.js"></script>
+</body>
+</html>
+
